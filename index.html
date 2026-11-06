@@ -43,23 +43,50 @@
           unfolded: { bw: 164.6, bh: 117.8, sw: 157.5, sh: 110.8, br: 10, sr: 8, defaultPortrait: false }
         }
       },
-      ipad_mini_a17: {
-        name: 'iPad mini (A17 Pro)', brand: 'Apple', hasFold: false,
-        variants: { normal: { bw: 134.8, bh: 195.4, sw: 115.7, sh: 176.2, br: 12, sr: 8, defaultPortrait: true } }
+      iphone_18_pro_max: {
+        name: 'iPhone 18 Pro Max', brand: 'Apple', hasFold: false,
+        variants: { normal: { bw: 78.0, bh: 163.4, sw: 73.5, sh: 159.2, br: 14, sr: 12, defaultPortrait: true } }
+      },
+      iphone_18_pro: {
+        name: 'iPhone 18 Pro', brand: 'Apple', hasFold: false,
+        variants: { normal: { bw: 71.9, bh: 150.0, sw: 66.6, sh: 144.8, br: 13, sr: 11, defaultPortrait: true } }
       },
       iphone_15_pro: {
         name: 'iPhone 15 Pro', brand: 'Apple', hasFold: false,
         variants: { normal: { bw: 70.6, bh: 146.6, sw: 64.9, sh: 140.6, br: 12, sr: 10, defaultPortrait: true } }
       },
-      iphone_18_pro_max: {
-        name: 'iPhone 18 Pro Max', brand: 'Apple', hasFold: false,
-        variants: { normal: { bw: 78.0, bh: 163.4, sw: 73.5, sh: 159.2, br: 14, sr: 12, defaultPortrait: true } }
+      iphone_13_mini: {
+        name: 'iPhone 13 mini', brand: 'Apple', hasFold: false,
+        variants: { normal: { bw: 64.2, bh: 131.5, sw: 57.6, sh: 124.9, br: 10, sr: 8, defaultPortrait: true } }
+      },
+      iphone_original: {
+        name: 'Original iPhone (2007)', brand: 'Apple', hasFold: false,
+        variants: { normal: { bw: 61.0, bh: 115.0, sw: 49.3, sh: 74.0, br: 11, sr: 0, defaultPortrait: true } }
+      },
+      ipad_air_11: {
+        name: 'iPad Air 11"', brand: 'Apple', hasFold: false,
+        variants: { normal: { bw: 178.5, bh: 247.6, sw: 157.6, sh: 226.9, br: 14, sr: 10, defaultPortrait: true } }
+      },
+      ipad_mini_a17: {
+        name: 'iPad mini (A17 Pro)', brand: 'Apple', hasFold: false,
+        variants: { normal: { bw: 134.8, bh: 195.4, sw: 115.7, sh: 176.2, br: 12, sr: 8, defaultPortrait: true } }
       },
       pixel_fold: {
         name: 'Pixel Fold (Original)', brand: 'Google', hasFold: true,
         variants: {
           folded: { bw: 79.5, bh: 139.7, sw: 67.5, sh: 130.4, br: 8, sr: 6, defaultPortrait: true },
           unfolded: { bw: 158.7, bh: 139.7, sw: 148.4, sh: 123.7, br: 8, sr: 6, defaultPortrait: false }
+        }
+      },
+      s26_ultra: {
+        name: 'Galaxy S26 Ultra', brand: 'Samsung', hasFold: false,
+        variants: { normal: { bw: 78.1, bh: 163.6, sw: 73.4, sh: 159.1, br: 8, sr: 6, defaultPortrait: true } }
+      },
+      z_fold_8_ultra: {
+        name: 'Galaxy Z Fold 8 Ultra', brand: 'Samsung', hasFold: true,
+        variants: {
+          folded: { bw: 72.8, bh: 158.4, sw: 65.0, sh: 151.7, br: 8, sr: 6, defaultPortrait: true },
+          unfolded: { bw: 143.2, bh: 158.4, sw: 135.8, sh: 150.7, br: 8, sr: 6, defaultPortrait: true } 
         }
       },
       z_fold_8: {
@@ -69,11 +96,18 @@
           unfolded: { bw: 161.4, bh: 123.9, sw: 154.1, sh: 116.3, br: 6, sr: 4, defaultPortrait: false }
         }
       },
-      z_fold_8_ultra: {
-        name: 'Galaxy Z Fold 8 Ultra', brand: 'Samsung', hasFold: true,
+      z_fold_original: {
+        name: 'Original Galaxy Fold (2019)', brand: 'Samsung', hasFold: true,
         variants: {
-          folded: { bw: 72.8, bh: 158.4, sw: 65.0, sh: 151.7, br: 8, sr: 6, defaultPortrait: true },
-          unfolded: { bw: 143.2, bh: 158.4, sw: 135.8, sh: 150.7, br: 8, sr: 6, defaultPortrait: true } 
+          folded: { bw: 62.9, bh: 160.9, sw: 46.0, sh: 107.4, br: 9, sr: 4, defaultPortrait: true },
+          unfolded: { bw: 117.9, bh: 160.9, sw: 107.7, sh: 150.9, br: 9, sr: 6, defaultPortrait: true }
+        }
+      },
+      xiaomi_18_fold: {
+        name: 'Xiaomi 18 Fold', brand: 'Xiaomi', hasFold: true,
+        variants: {
+          folded: { bw: 83.6, bh: 117.8, sw: 77.0, sh: 112.9, br: 10, sr: 8, defaultPortrait: true },
+          unfolded: { bw: 163.8, bh: 117.8, sw: 157.2, sh: 111.2, br: 10, sr: 8, defaultPortrait: false }
         }
       }
     };
@@ -97,6 +131,7 @@
       const [slot2, setSlot2] = useState({ id: 'z_fold_8', formFactor: 'unfolded', portrait: false });
       const [showBezel, setShowBezel] = useState(true);
       const [viewMode, setViewMode] = useState('side-by-side');
+      const [alignment, setAlignment] = useState('center');
       const [mediaRatio, setMediaRatio] = useState('16:9');
       const [scale, setScale] = useState(2.2);
 
@@ -186,9 +221,10 @@
         const pBr = dims.br * scale, pSr = dims.sr * scale;
         const ratioVal = RATIOS[mediaRatio].value;
         const mediaDiagonal = ratioVal ? (Math.sqrt(dims.mediaW**2 + dims.mediaH**2) / 25.4).toFixed(2) : 0;
+        const previewAlignClass = !isOverlay && (alignment === 'left' || alignment === 'bottom-left') ? 'items-start md:items-center' : 'items-center';
 
         return (
-          <div className={`relative flex flex-col items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]`} style={{ zIndex: isOverlay ? (slotNum === 1 ? 20 : 10) : 1 }}>
+          <div className={`relative flex flex-col ${previewAlignClass} justify-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]`} style={{ zIndex: isOverlay ? (slotNum === 1 ? 20 : 10) : 1 }}>
             <div className={`flex items-center justify-center border-2 ${dims.color} shadow-2xl transition-all duration-500 backdrop-blur-sm`} style={{ width: `${pBw}px`, height: `${pBh}px`, borderRadius: `${pBr}px`, backgroundColor: isOverlay ? dims.overlayColor : dims.bg }}>
               <div className={`relative border border-gray-400/30 flex items-center justify-center overflow-hidden transition-all duration-500`} style={{ width: `${pSw}px`, height: `${pSh}px`, borderRadius: `${pSr}px`, backgroundColor: isOverlay ? dims.overlayScreenColor : dims.sbg }}>
                 {ratioVal && (
@@ -223,15 +259,24 @@
                 <optgroup label="Apple">
                   <option value="iphone_duo">iPhone Duo (Foldable)</option>
                   <option value="iphone_18_pro_max">iPhone 18 Pro Max</option>
+                  <option value="iphone_18_pro">iPhone 18 Pro</option>
                   <option value="iphone_15_pro">iPhone 15 Pro</option>
+                  <option value="iphone_13_mini">iPhone 13 mini</option>
+                  <option value="iphone_original">Original iPhone (2007)</option>
+                  <option value="ipad_air_11">iPad Air 11"</option>
                   <option value="ipad_mini_a17">iPad mini (A17 Pro)</option>
+                </optgroup>
+                <optgroup label="Samsung">
+                  <option value="s26_ultra">Galaxy S26 Ultra</option>
+                  <option value="z_fold_8_ultra">Galaxy Z Fold 8 Ultra</option>
+                  <option value="z_fold_8">Galaxy Z Fold 8 (Standard)</option>
+                  <option value="z_fold_original">Original Galaxy Fold (2019)</option>
                 </optgroup>
                 <optgroup label="Google">
                   <option value="pixel_fold">Pixel Fold (Original)</option>
                 </optgroup>
-                <optgroup label="Samsung">
-                  <option value="z_fold_8_ultra">Galaxy Z Fold 8 Ultra</option>
-                  <option value="z_fold_8">Galaxy Z Fold 8 (Standard)</option>
+                <optgroup label="Xiaomi">
+                  <option value="xiaomi_18_fold">Xiaomi 18 Fold</option>
                 </optgroup>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
@@ -304,6 +349,25 @@
                     <button onClick={() => setViewMode('overlay')} className={`py-2 px-3 text-sm rounded-md font-semibold flex items-center justify-center gap-1.5 transition-all ${viewMode === 'overlay' ? 'bg-white shadow-sm text-gray-900 ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'}`}><Layers className="w-4 h-4" /> Overlay</button>
                   </div>
                 </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Alignment ({showBezel ? 'Body' : 'Screen'})</label>
+                  <div className="grid grid-cols-2 gap-1.5 bg-gray-100/80 p-1 rounded-lg">
+                    {[
+                      { id: 'center', label: 'Center' },
+                      { id: 'bottom-left', label: 'Bottom-Left' },
+                      { id: 'bottom', label: 'Bottom' },
+                      { id: 'left', label: 'Left' }
+                    ].map(opt => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setAlignment(opt.id)}
+                        className={`py-1.5 px-3 text-sm rounded-md font-semibold transition-all ${alignment === opt.id ? 'bg-white shadow-sm text-gray-900 ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="space-y-2 pt-2">
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex justify-between"><span>Zoom Scale</span><span className="font-mono text-gray-400">{scale.toFixed(1)}x</span></label>
                   <div className="flex items-center gap-3">
@@ -323,9 +387,22 @@
               )}
               <div className="min-h-full min-w-full p-8 md:p-16 flex items-center justify-center">
                 {viewMode === 'side-by-side' ? (
-                  <div className="flex flex-col md:flex-row items-center justify-center gap-16 lg:gap-32"><DevicePreview dims={dims1} isOverlay={false} slotNum={1} /><DevicePreview dims={dims2} isOverlay={false} slotNum={2} /></div>
+                  <div className={`flex flex-col md:flex-row justify-center gap-16 lg:gap-32 ${{
+                    'center': 'items-center md:items-center',
+                    'bottom-left': 'items-start md:items-end',
+                    'bottom': 'items-center md:items-end',
+                    'left': 'items-start md:items-center'
+                  }[alignment]}`}>
+                    <DevicePreview dims={dims1} isOverlay={false} slotNum={1} />
+                    <DevicePreview dims={dims2} isOverlay={false} slotNum={2} />
+                  </div>
                 ) : (
-                  <div className="grid place-items-center relative">
+                  <div className={`grid relative ${{
+                    'center': 'items-center justify-items-center',
+                    'bottom-left': 'items-end justify-items-start',
+                    'bottom': 'items-end justify-items-center',
+                    'left': 'items-center justify-items-start'
+                  }[alignment]}`}>
                     <div className="col-start-1 row-start-1"><DevicePreview dims={dims2} isOverlay={true} slotNum={2} /></div>
                     <div className="col-start-1 row-start-1"><DevicePreview dims={dims1} isOverlay={true} slotNum={1} /></div>
                   </div>
