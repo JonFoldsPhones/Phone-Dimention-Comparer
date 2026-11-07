@@ -22,7 +22,7 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState } = React;
+    const { useState, useRef, useEffect } = React;
 
     const SvgIcon = ({ children, className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>;
     const Smartphone = ({ className }) => <SvgIcon className={className}><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></SvgIcon>;
@@ -34,83 +34,153 @@
     const Layout = ({ className }) => <SvgIcon className={className}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></SvgIcon>;
     const ChevronDown = ({ className }) => <SvgIcon className={className}><polyline points="6 9 12 15 18 9"/></SvgIcon>;
     const Film = ({ className }) => <SvgIcon className={className}><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" x2="7" y1="2" y2="22"/><line x1="17" x2="17" y1="2" y2="22"/><line x1="2" x2="22" y1="12" y2="12"/><line x1="2" x2="7" y1="7" y2="7"/><line x1="2" x2="7" y1="17" y2="17"/><line x1="17" x2="22" y1="17" y2="17"/><line x1="17" x2="22" y1="7" y2="7"/></SvgIcon>;
+    const Search = ({ className }) => <SvgIcon className={className}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></SvgIcon>;
+    const X = ({ className }) => <SvgIcon className={className}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></SvgIcon>;
 
     const DEVICES = {
       iphone_duo: {
-        name: 'iPhone Duo', brand: 'Apple', hasFold: true,
+        name: 'iPhone Duo', brand: 'Apple', category: 'Foldables', hasFold: true,
         variants: {
-          folded: { bw: 84.1, bh: 117.8, sw: 77.1, sh: 112.2, br: 10, sr: 8, defaultPortrait: true },
-          unfolded: { bw: 164.6, bh: 117.8, sw: 157.5, sh: 110.8, br: 10, sr: 8, defaultPortrait: false }
+          folded: { bw: 84.1, bh: 117.8, sw: 77.1, sh: 112.2, thickness: 11.3, br: 10, sr: 8, defaultPortrait: true },
+          unfolded: { bw: 164.6, bh: 117.8, sw: 157.5, sh: 110.8, thickness: 5.2, br: 10, sr: 8, defaultPortrait: false }
         }
       },
       iphone_18_pro_max: {
-        name: 'iPhone 18 Pro Max', brand: 'Apple', hasFold: false,
-        variants: { normal: { bw: 78.0, bh: 163.4, sw: 73.5, sh: 159.2, br: 14, sr: 12, defaultPortrait: true } }
+        name: 'iPhone 18 Pro Max', brand: 'Apple', category: 'Phones', hasFold: false,
+        variants: { normal: { bw: 78.0, bh: 163.4, sw: 73.5, sh: 159.2, thickness: 8.75, br: 14, sr: 12, defaultPortrait: true } }
       },
       iphone_18_pro: {
-        name: 'iPhone 18 Pro', brand: 'Apple', hasFold: false,
-        variants: { normal: { bw: 71.9, bh: 150.0, sw: 66.6, sh: 144.8, br: 13, sr: 11, defaultPortrait: true } }
+        name: 'iPhone 18 Pro', brand: 'Apple', category: 'Phones', hasFold: false,
+        variants: { normal: { bw: 71.9, bh: 150.0, sw: 66.6, sh: 144.8, thickness: 8.75, br: 13, sr: 11, defaultPortrait: true } }
       },
       iphone_15_pro: {
-        name: 'iPhone 15 Pro', brand: 'Apple', hasFold: false,
-        variants: { normal: { bw: 70.6, bh: 146.6, sw: 64.9, sh: 140.6, br: 12, sr: 10, defaultPortrait: true } }
+        name: 'iPhone 15 Pro', brand: 'Apple', category: 'Phones', hasFold: false,
+        variants: { normal: { bw: 70.6, bh: 146.6, sw: 64.9, sh: 140.6, thickness: 8.25, br: 12, sr: 10, defaultPortrait: true } }
       },
       iphone_13_mini: {
-        name: 'iPhone 13 mini', brand: 'Apple', hasFold: false,
-        variants: { normal: { bw: 64.2, bh: 131.5, sw: 57.6, sh: 124.9, br: 10, sr: 8, defaultPortrait: true } }
+        name: 'iPhone 13 mini', brand: 'Apple', category: 'Phones', hasFold: false,
+        variants: { normal: { bw: 64.2, bh: 131.5, sw: 57.6, sh: 124.9, thickness: 7.65, br: 10, sr: 8, defaultPortrait: true } }
       },
       iphone_original: {
-        name: 'Original iPhone (2007)', brand: 'Apple', hasFold: false,
-        variants: { normal: { bw: 61.0, bh: 115.0, sw: 49.3, sh: 74.0, br: 11, sr: 0, defaultPortrait: true } }
+        name: 'Original iPhone (2007)', brand: 'Apple', category: 'Retro & Audio', hasFold: false,
+        variants: { normal: { bw: 61.0, bh: 115.0, sw: 49.3, sh: 74.0, thickness: 11.6, br: 11, sr: 0, defaultPortrait: true } }
+      },
+      ipod_touch_7: {
+        name: 'iPod touch (7th Gen - Final)', brand: 'Apple', category: 'Retro & Audio', hasFold: false,
+        variants: { normal: { bw: 58.6, bh: 123.4, sw: 49.9, sh: 88.5, thickness: 6.1, br: 9, sr: 0, defaultPortrait: true } }
+      },
+      ipod_classic: {
+        name: 'iPod Classic (6th/7th Gen)', brand: 'Apple', category: 'Retro & Audio', hasFold: false,
+        variants: { normal: { bw: 61.8, bh: 103.5, sw: 50.8, sh: 38.1, thickness: 10.5, maxThickness: 13.5, thicknessNote: '10.5 mm (Thin 80/120/160GB) • 13.5 mm (2007 Thick 160GB)', br: 7, sr: 2, defaultPortrait: true } }
       },
       ipad_air_11: {
-        name: 'iPad Air 11"', brand: 'Apple', hasFold: false,
-        variants: { normal: { bw: 178.5, bh: 247.6, sw: 157.6, sh: 226.9, br: 14, sr: 10, defaultPortrait: true } }
+        name: 'iPad Air 11"', brand: 'Apple', category: 'Tablets', hasFold: false,
+        variants: { normal: { bw: 178.5, bh: 247.6, sw: 157.6, sh: 226.9, thickness: 6.1, br: 14, sr: 10, defaultPortrait: true } }
       },
       ipad_mini_a17: {
-        name: 'iPad mini (A17 Pro)', brand: 'Apple', hasFold: false,
-        variants: { normal: { bw: 134.8, bh: 195.4, sw: 115.7, sh: 176.2, br: 12, sr: 8, defaultPortrait: true } }
+        name: 'iPad mini (A17 Pro)', brand: 'Apple', category: 'Tablets', hasFold: false,
+        variants: { normal: { bw: 134.8, bh: 195.4, sw: 115.7, sh: 176.2, thickness: 6.3, br: 12, sr: 8, defaultPortrait: true } }
+      },
+      pixel_11_pro_fold: {
+        name: 'Pixel 11 Pro Fold', brand: 'Google', category: 'Foldables', hasFold: true,
+        variants: {
+          folded: { bw: 76.0, bh: 155.2, sw: 69.1, sh: 149.9, thickness: 10.1, br: 12, sr: 10, defaultPortrait: true },
+          unfolded: { bw: 150.4, bh: 155.2, sw: 141.1, sh: 146.2, thickness: 5.0, br: 12, sr: 10, defaultPortrait: true }
+        }
       },
       pixel_fold: {
-        name: 'Pixel Fold (Original)', brand: 'Google', hasFold: true,
+        name: 'Pixel Fold (Original)', brand: 'Google', category: 'Foldables', hasFold: true,
         variants: {
-          folded: { bw: 79.5, bh: 139.7, sw: 67.5, sh: 130.4, br: 8, sr: 6, defaultPortrait: true },
-          unfolded: { bw: 158.7, bh: 139.7, sw: 148.4, sh: 123.7, br: 8, sr: 6, defaultPortrait: false }
+          folded: { bw: 79.5, bh: 139.7, sw: 67.5, sh: 130.4, thickness: 12.1, br: 8, sr: 6, defaultPortrait: true },
+          unfolded: { bw: 158.7, bh: 139.7, sw: 148.4, sh: 123.7, thickness: 5.8, br: 8, sr: 6, defaultPortrait: false }
         }
       },
       s26_ultra: {
-        name: 'Galaxy S26 Ultra', brand: 'Samsung', hasFold: false,
-        variants: { normal: { bw: 78.1, bh: 163.6, sw: 73.4, sh: 159.1, br: 8, sr: 6, defaultPortrait: true } }
+        name: 'Galaxy S26 Ultra', brand: 'Samsung', category: 'Phones', hasFold: false,
+        variants: { normal: { bw: 78.1, bh: 163.6, sw: 73.4, sh: 159.1, thickness: 7.9, maxThickness: 12.33, thicknessNote: '7.9 mm chassis • 12.33 mm w/ camera bump', br: 8, sr: 6, defaultPortrait: true } }
       },
       z_fold_8_ultra: {
-        name: 'Galaxy Z Fold 8 Ultra', brand: 'Samsung', hasFold: true,
+        name: 'Galaxy Z Fold 8 Ultra', brand: 'Samsung', category: 'Foldables', hasFold: true,
         variants: {
-          folded: { bw: 72.8, bh: 158.4, sw: 65.0, sh: 151.7, br: 8, sr: 6, defaultPortrait: true },
-          unfolded: { bw: 143.2, bh: 158.4, sw: 135.8, sh: 150.7, br: 8, sr: 6, defaultPortrait: true } 
+          folded: { bw: 72.8, bh: 158.4, sw: 65.0, sh: 151.7, thickness: 8.9, br: 8, sr: 6, defaultPortrait: true },
+          unfolded: { bw: 143.2, bh: 158.4, sw: 135.8, sh: 150.7, thickness: 4.1, br: 8, sr: 6, defaultPortrait: true } 
         }
       },
       z_fold_8: {
-        name: 'Galaxy Z Fold 8', brand: 'Samsung', hasFold: true,
+        name: 'Galaxy Z Fold 8', brand: 'Samsung', category: 'Foldables', hasFold: true,
         variants: {
-          folded: { bw: 81.9, bh: 123.9, sw: 74.7, sh: 118.0, br: 6, sr: 4, defaultPortrait: true },
-          unfolded: { bw: 161.4, bh: 123.9, sw: 154.1, sh: 116.3, br: 6, sr: 4, defaultPortrait: false }
+          folded: { bw: 81.9, bh: 123.9, sw: 74.7, sh: 118.0, thickness: 9.7, br: 6, sr: 4, defaultPortrait: true },
+          unfolded: { bw: 161.4, bh: 123.9, sw: 154.1, sh: 116.3, thickness: 4.5, br: 6, sr: 4, defaultPortrait: false }
         }
       },
       z_fold_original: {
-        name: 'Original Galaxy Fold (2019)', brand: 'Samsung', hasFold: true,
+        name: 'Original Galaxy Fold (2019)', brand: 'Samsung', category: 'Foldables', hasFold: true,
         variants: {
-          folded: { bw: 62.9, bh: 160.9, sw: 46.0, sh: 107.4, br: 9, sr: 4, defaultPortrait: true },
-          unfolded: { bw: 117.9, bh: 160.9, sw: 107.7, sh: 150.9, br: 9, sr: 6, defaultPortrait: true }
+          folded: { bw: 62.9, bh: 160.9, sw: 46.0, sh: 107.4, thickness: 15.5, maxThickness: 17.1, thicknessNote: '15.5 mm outer edge • 17.1 mm at hinge gap', br: 9, sr: 4, defaultPortrait: true },
+          unfolded: { bw: 117.9, bh: 160.9, sw: 107.7, sh: 150.9, thickness: 6.9, maxThickness: 7.6, thicknessNote: '6.9 mm chassis • 7.6 mm w/ raised bezel lip', br: 9, sr: 6, defaultPortrait: true }
+        }
+      },
+      oppo_find_n6: {
+        name: 'Oppo Find N6', brand: 'Oppo', category: 'Foldables', hasFold: true,
+        variants: {
+          folded: { bw: 74.1, bh: 159.9, sw: 67.2, sh: 154.1, thickness: 8.93, br: 10, sr: 8, defaultPortrait: true },
+          unfolded: { bw: 145.6, bh: 159.9, sw: 138.5, sh: 152.8, thickness: 4.21, br: 10, sr: 8, defaultPortrait: true }
         }
       },
       xiaomi_18_fold: {
-        name: 'Xiaomi 18 Fold', brand: 'Xiaomi', hasFold: true,
+        name: 'Xiaomi 18 Fold', brand: 'Xiaomi', category: 'Foldables', hasFold: true,
         variants: {
-          folded: { bw: 83.6, bh: 117.8, sw: 77.0, sh: 112.9, br: 10, sr: 8, defaultPortrait: true },
-          unfolded: { bw: 163.8, bh: 117.8, sw: 157.2, sh: 111.2, br: 10, sr: 8, defaultPortrait: false }
+          folded: { bw: 83.6, bh: 117.8, sw: 77.0, sh: 112.9, thickness: 10.68, br: 10, sr: 8, defaultPortrait: true },
+          unfolded: { bw: 163.8, bh: 117.8, sw: 157.2, sh: 111.2, thickness: 5.02, br: 10, sr: 8, defaultPortrait: false }
         }
+      },
+      lg_rollable: {
+        name: 'LG Rollable (Unreleased)', brand: 'LG', category: 'Foldables', hasFold: true,
+        foldLabels: ['Rolled', 'Unrolled'],
+        variants: {
+          folded: { bw: 75.7, bh: 169.5, sw: 70.6, sh: 156.8, thickness: 10.5, br: 8, sr: 6, defaultPortrait: true },
+          unfolded: { bw: 109.4, bh: 169.5, sw: 104.5, sh: 156.8, thickness: 10.5, thicknessNote: '10.5 mm main spool housing (extendable wing is thinner)', br: 8, sr: 6, defaultPortrait: true }
+        }
+      },
+      surface_duo: {
+        name: 'Microsoft Surface Duo', brand: 'Microsoft', category: 'Foldables', hasFold: true,
+        variants: {
+          folded: { bw: 93.3, bh: 145.2, sw: 85.3, sh: 113.8, thickness: 9.9, br: 8, sr: 2, defaultPortrait: true },
+          unfolded: { bw: 186.9, bh: 145.2, sw: 171.2, sh: 113.8, thickness: 4.8, br: 8, sr: 2, defaultPortrait: false }
+        }
+      },
+      zune_hd: {
+        name: 'Microsoft Zune HD', brand: 'Microsoft', category: 'Retro & Audio', hasFold: false,
+        variants: { normal: { bw: 52.7, bh: 102.1, sw: 41.1, sh: 73.1, thickness: 8.9, br: 6, sr: 0, defaultPortrait: true } }
+      },
+      ps_vita: {
+        name: 'PlayStation Vita (PCH-1000)', brand: 'Sony', category: 'Handhelds', hasFold: false,
+        variants: { normal: { bw: 182.0, bh: 83.55, sw: 110.5, sh: 62.6, thickness: 18.6, maxThickness: 23.0, thicknessNote: '18.6 mm chassis • ~23.0 mm w/ thumbsticks', br: 41.7, sr: 2, defaultPortrait: false } }
+      },
+      nintendo_switch: {
+        name: 'Nintendo Switch', brand: 'Nintendo', category: 'Handhelds', hasFold: false,
+        variants: { normal: { bw: 239.0, bh: 102.0, sw: 137.3, sh: 77.2, thickness: 13.9, maxThickness: 28.4, thicknessNote: '13.9 mm tablet body • 28.4 mm w/ sticks & ZL/ZR triggers', br: 20, sr: 2, defaultPortrait: false } }
+      },
+      steam_deck_oled: {
+        name: 'Steam Deck OLED', brand: 'Valve', category: 'Handhelds', hasFold: false,
+        variants: { normal: { bw: 298.0, bh: 117.0, sw: 159.4, sh: 99.6, thickness: 20.3, maxThickness: 49.0, thicknessNote: '20.3 mm center screen chassis • 49.0 mm w/ grips & sticks', br: 24, sr: 2, defaultPortrait: false } }
+      },
+      rabbit_r1: {
+        name: 'Rabbit R1', brand: 'Rabbit', category: 'Retro & Audio', hasFold: false,
+        variants: { normal: { bw: 78.0, bh: 78.0, sw: 43.9, sh: 58.5, thickness: 13.0, br: 10, sr: 4, defaultPortrait: true } }
+      },
+      credit_card: {
+        name: 'Standard Credit Card', brand: 'Reference', category: 'Reference', hasFold: false,
+        variants: { normal: { bw: 85.6, bh: 54.0, sw: 85.6, sh: 54.0, thickness: 0.76, br: 3.2, sr: 3.2, defaultPortrait: false } }
       }
     };
+
+    const formatThick = (val) => {
+      if (val === undefined || val === null) return '';
+      return Math.round(val * 100) % 10 !== 0 ? val.toFixed(2) : val.toFixed(1);
+    };
+
+    const CATEGORIES = ['All', 'Foldables', 'Phones', 'Tablets', 'Handhelds', 'Retro & Audio', 'Reference'];
 
     const SLOT_THEMES = {
       1: { color: "border-blue-500", sbg: "bg-blue-100", overlayColor: "rgba(59, 130, 246, 0.2)", overlayScreenColor: "rgba(59, 130, 246, 0.5)", legendColor: "bg-blue-500/60 ring-blue-500/30", mediaBg: "bg-slate-800", mediaBgOverlay: "bg-blue-700/70 border border-blue-400/50" },
@@ -127,10 +197,11 @@
     };
 
     const App = () => {
-      const [slot1, setSlot1] = useState({ id: 'iphone_duo', formFactor: 'unfolded', portrait: false });
-      const [slot2, setSlot2] = useState({ id: 'z_fold_8', formFactor: 'unfolded', portrait: false });
+      const [slot1, setSlot1] = useState({ id: 'iphone_duo', formFactor: 'folded', portrait: true });
+      const [slot2, setSlot2] = useState({ id: 'z_fold_8_ultra', formFactor: 'folded', portrait: true });
       const [showBezel, setShowBezel] = useState(true);
       const [viewMode, setViewMode] = useState('side-by-side');
+      const [perspective, setPerspective] = useState('front-and-side');
       const [alignment, setAlignment] = useState('center');
       const [mediaRatio, setMediaRatio] = useState('16:9');
       const [scale, setScale] = useState(2.2);
@@ -161,7 +232,8 @@
           [curSw, curSh] = [curSh, curSw];
         }
 
-        const formName = device.hasFold ? (config.formFactor === 'folded' ? ' (Folded)' : ' (Unfolded)') : '';
+        const foldLabels = device.foldLabels || ['Folded', 'Unfolded'];
+        const formName = device.hasFold ? ` (${config.formFactor === 'folded' ? foldLabels[0] : foldLabels[1]})` : '';
         const screenArea = curSw * curSh;
         const ratioVal = RATIOS[currentRatio].value;
         let mediaW = 0, mediaH = 0, mediaArea = 0;
@@ -178,6 +250,10 @@
           overlayColor: theme.overlayColor, overlayScreenColor: theme.overlayScreenColor,
           mediaBg: theme.mediaBg, mediaBgOverlay: theme.mediaBgOverlay,
           br: variant.br, sr: variant.sr, rawBw: curBw, rawBh: curBh, rawSw: curSw, rawSh: curSh,
+          thickness: variant.thickness,
+          maxThickness: variant.maxThickness || null,
+          thicknessNote: variant.thicknessNote || null,
+          isFoldedState: device.hasFold && !device.foldLabels && config.formFactor === 'folded',
           screenArea, mediaW, mediaH, mediaArea
         };
 
@@ -188,29 +264,175 @@
       const dims1 = getComputedDims(slot1, 1, mediaRatio);
       const dims2 = getComputedDims(slot2, 2, mediaRatio);
 
+      const getThicknessComparisonText = (d1, d2) => {
+        if (!d1?.thickness || !d2?.thickness) return null;
+        const t1 = d1.thickness;
+        const t2 = d2.thickness;
+
+        if (Math.abs(t1 - t2) < 0.01) {
+          return (
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Chassis Thickness</span>
+              <div className="text-sm font-bold text-gray-800">Identical Thickness ({formatThick(t1)} mm)</div>
+            </div>
+          );
+        }
+
+        const is1Thicker = t1 > t2;
+        const thickerDims = is1Thicker ? d1 : d2;
+        const thinnerDims = is1Thicker ? d2 : d1;
+        const diffMm = Math.abs(t1 - t2);
+        const percentThicker = (((thickerDims.thickness / thinnerDims.thickness) - 1) * 100).toFixed(1);
+        const highlightColor = is1Thicker ? 'text-blue-600' : 'text-orange-600';
+
+        return (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+              Chassis Thickness ({formatThick(t1)} mm vs {formatThick(t2)} mm)
+            </span>
+            <div className="text-sm text-gray-700 leading-tight">
+              <span className="font-bold text-gray-900">{thickerDims.name}</span> is <span className={`font-black ${highlightColor}`}>+{formatThick(diffMm)} mm (+{percentThicker}%)</span> thicker than {thinnerDims.name}
+            </div>
+          </div>
+        );
+      };
+
       const getComparisonText = (val1, val2, name1, name2, label) => {
         if (!val1 || !val2) return null;
         if (Math.abs(val1 - val2) < 0.1) {
           return (
             <div className="flex flex-col gap-0.5">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{label}</span>
-              <div className="text-sm font-bold text-gray-800">Identical Size</div>
+              <div className="text-sm font-bold text-gray-800">Identical Size (0% difference)</div>
             </div>
           );
         }
-        
+
         const is1Bigger = val1 > val2;
         const biggerName = is1Bigger ? name1 : name2;
         const smallerName = is1Bigger ? name2 : name1;
-        const ratio = is1Bigger ? (val1 / val2) : (val2 / val1);
-        const percent = ((ratio - 1) * 100).toFixed(1);
+        const percentBigger = (((Math.max(val1, val2) / Math.min(val1, val2)) - 1) * 100).toFixed(1);
         const highlightColor = is1Bigger ? 'text-blue-600' : 'text-orange-600';
-        
+
         return (
           <div className="flex flex-col gap-0.5">
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{label}</span>
             <div className="text-sm text-gray-700 leading-tight">
-              <span className="font-bold text-gray-900">{biggerName}</span> is <span className={`font-black ${highlightColor}`}>+{percent}%</span> larger than {smallerName}
+              <span className="font-bold text-gray-900">{biggerName}</span> is <span className={`font-black ${highlightColor}`}>+{percentBigger}%</span> larger than {smallerName}
+            </div>
+          </div>
+        );
+      };
+
+      const SideProfileBar = ({ dims, isOverlay, slotNum, vertical = true }) => {
+        const pBh = dims.bh * scale;
+        const pBw = dims.bw * scale;
+        const pThick = Math.max(1.5, dims.thickness * scale);
+        const pMaxThick = dims.maxThickness ? dims.maxThickness * scale : null;
+        const edgeRadius = Math.min(pThick / 2, 4 * scale);
+
+        if (vertical) {
+          return (
+            <div className="flex flex-col items-center justify-end">
+              <div className="relative flex items-center justify-center" style={{ height: `${pBh}px`, width: `${pMaxThick || pThick}px` }}>
+                {pMaxThick && (
+                  <div
+                    title={dims.thicknessNote || `Max protrusion: ${formatThick(dims.maxThickness)} mm`}
+                    className={`absolute inset-y-0 left-0 border border-dashed ${dims.color} opacity-55 rounded-sm`}
+                    style={{
+                      width: `${pMaxThick}px`,
+                      height: `${pBh}px`,
+                      backgroundColor: isOverlay ? dims.overlayColor : 'rgba(148, 163, 184, 0.15)'
+                    }}
+                  />
+                )}
+                <div
+                  className={`relative border-2 ${dims.color} shadow-md transition-all duration-500 overflow-hidden flex flex-col justify-between`}
+                  style={{
+                    width: `${pThick}px`,
+                    height: `${pBh}px`,
+                    borderRadius: `${edgeRadius}px`,
+                    backgroundColor: isOverlay ? dims.overlayScreenColor : dims.sbg,
+                    marginLeft: pMaxThick ? 0 : 'auto',
+                    marginRight: 'auto'
+                  }}
+                >
+                  {dims.isFoldedState && (
+                    <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-gray-600/40" />
+                  )}
+                </div>
+              </div>
+              {!isOverlay && (
+                <div className="mt-2 flex flex-col items-center">
+                  <span className={`text-[10px] font-black px-1.5 py-0.5 rounded shadow-sm border ${slotNum === 1 ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
+                    {formatThick(dims.thickness)} mm
+                  </span>
+                  {dims.maxThickness && (
+                    <span className="text-[9px] text-gray-500 font-semibold mt-0.5">
+                      max {formatThick(dims.maxThickness)} mm
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        const tableScale = Math.max(scale, 3.2);
+        const hWidth = dims.bw * tableScale;
+        const hThick = Math.max(2, dims.thickness * tableScale);
+        const hMaxThick = dims.maxThickness ? dims.maxThickness * tableScale : null;
+        const hRadius = Math.min(hThick / 2, 4 * tableScale);
+        const cardsCount = (dims.thickness / 0.76).toFixed(1);
+
+        return (
+          <div className="flex flex-col items-center">
+            <div className="relative flex flex-col items-center justify-end" style={{ width: `${hWidth}px`, height: `${hMaxThick || hThick}px` }}>
+              {hMaxThick && (
+                <div
+                  className={`absolute inset-x-0 bottom-0 border border-dashed ${dims.color} rounded-t-md flex items-start justify-center pt-1`}
+                  style={{
+                    width: `${hWidth}px`,
+                    height: `${hMaxThick}px`,
+                    backgroundColor: 'rgba(148, 163, 184, 0.14)'
+                  }}
+                >
+                  <span className="text-[10px] font-bold text-gray-600 bg-white/80 px-1.5 rounded">
+                    Max: {formatThick(dims.maxThickness)} mm
+                  </span>
+                </div>
+              )}
+              <div
+                className={`relative border-2 ${dims.color} shadow-lg transition-all duration-500 overflow-hidden`}
+                style={{
+                  width: `${hWidth}px`,
+                  height: `${hThick}px`,
+                  borderRadius: `${hRadius}px`,
+                  backgroundColor: dims.sbg
+                }}
+              >
+                {dims.isFoldedState && (
+                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-gray-600/45" />
+                )}
+              </div>
+            </div>
+            <div className="w-full h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full mt-0.5 opacity-60" />
+
+            <div className="mt-3 text-center bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-xl shadow-sm border border-gray-200/80">
+              <div className="font-bold text-gray-800 text-sm">{dims.name}</div>
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <span className={`text-xs font-black px-2 py-0.5 rounded ${slotNum === 1 ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}`}>
+                  {formatThick(dims.thickness)} mm thick
+                </span>
+                <span className="text-xs text-gray-500 font-medium">
+                  (≈ {cardsCount} credit cards)
+                </span>
+              </div>
+              {dims.thicknessNote && (
+                <div className="text-[11px] text-gray-500 font-medium mt-1">
+                  {dims.thicknessNote}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -225,20 +447,36 @@
 
         return (
           <div className={`relative flex flex-col ${previewAlignClass} justify-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]`} style={{ zIndex: isOverlay ? (slotNum === 1 ? 20 : 10) : 1 }}>
-            <div className={`flex items-center justify-center border-2 ${dims.color} shadow-2xl transition-all duration-500 backdrop-blur-sm`} style={{ width: `${pBw}px`, height: `${pBh}px`, borderRadius: `${pBr}px`, backgroundColor: isOverlay ? dims.overlayColor : dims.bg }}>
-              <div className={`relative border border-gray-400/30 flex items-center justify-center overflow-hidden transition-all duration-500`} style={{ width: `${pSw}px`, height: `${pSh}px`, borderRadius: `${pSr}px`, backgroundColor: isOverlay ? dims.overlayScreenColor : dims.sbg }}>
-                {ratioVal && (
-                  <div className={`absolute flex flex-col items-center justify-center shadow-lg transition-all duration-500 ${isOverlay ? dims.mediaBgOverlay : dims.mediaBg}`} style={{ width: `${dims.mediaW * scale}px`, height: `${dims.mediaH * scale}px` }}>
-                    {!isOverlay && scale > 1.2 && <span className="text-white/90 font-bold text-[10px] sm:text-xs">{mediaDiagonal}"</span>}
-                  </div>
-                )}
-                {!isOverlay && !ratioVal && <span className="text-[10px] sm:text-xs font-bold opacity-60 text-center whitespace-pre-wrap px-2 z-10">{dims.rawSw.toFixed(1)} x {dims.rawSh.toFixed(1)} mm</span>}
+            <div className="flex items-start gap-3.5">
+              <div className={`flex items-center justify-center border-2 ${dims.color} shadow-2xl transition-all duration-500 backdrop-blur-sm`} style={{ width: `${pBw}px`, height: `${pBh}px`, borderRadius: `${pBr}px`, backgroundColor: isOverlay ? dims.overlayColor : dims.bg }}>
+                <div className={`relative border border-gray-400/30 flex items-center justify-center overflow-hidden transition-all duration-500`} style={{ width: `${pSw}px`, height: `${pSh}px`, borderRadius: `${pSr}px`, backgroundColor: isOverlay ? dims.overlayScreenColor : dims.sbg }}>
+                  {ratioVal && (
+                    <div className={`absolute flex flex-col items-center justify-center shadow-lg transition-all duration-500 ${isOverlay ? dims.mediaBgOverlay : dims.mediaBg}`} style={{ width: `${dims.mediaW * scale}px`, height: `${dims.mediaH * scale}px` }}>
+                      {!isOverlay && scale > 1.2 && <span className="text-white/90 font-bold text-[10px] sm:text-xs">{mediaDiagonal}"</span>}
+                    </div>
+                  )}
+                  {!isOverlay && !ratioVal && <span className="text-[10px] sm:text-xs font-bold opacity-60 text-center whitespace-pre-wrap px-2 z-10">{dims.rawSw.toFixed(1)} x {dims.rawSh.toFixed(1)} mm</span>}
+                </div>
               </div>
+
+              {!isOverlay && perspective === 'front-and-side' && (
+                <SideProfileBar dims={dims} isOverlay={false} slotNum={slotNum} vertical={true} />
+              )}
             </div>
+
             {!isOverlay && (
               <div className="mt-5 text-center whitespace-nowrap bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl shadow-sm border border-gray-100 z-10">
                 <div className="font-bold text-gray-800">{dims.name}</div>
-                <div className="text-xs text-gray-600 font-medium mt-0.5">{showBezel ? `Body: ${dims.rawBw.toFixed(1)} x ${dims.rawBh.toFixed(1)} mm` : `Screen: ${dims.rawSw.toFixed(1)} x ${dims.rawSh.toFixed(1)} mm`}</div>
+                <div className="text-xs text-gray-600 font-medium mt-0.5">
+                  {showBezel
+                    ? `Body: ${dims.rawBw.toFixed(1)} × ${dims.rawBh.toFixed(1)} × ${formatThick(dims.thickness)} mm`
+                    : `Screen: ${dims.rawSw.toFixed(1)} × ${dims.rawSh.toFixed(1)} mm (${formatThick(dims.thickness)} mm thick)`}
+                </div>
+                {dims.thicknessNote && (
+                  <div className="text-[11px] text-gray-500 font-medium mt-0.5">
+                    {dims.thicknessNote}
+                  </div>
+                )}
                 {ratioVal && <div className="text-xs text-indigo-600 font-bold mt-1 bg-indigo-50 px-2 py-0.5 rounded inline-block">Media: {dims.mediaW.toFixed(1)} x {dims.mediaH.toFixed(1)} mm</div>}
               </div>
             )}
@@ -248,45 +486,141 @@
 
       const DeviceControl = ({ slotNum, config }) => {
         const device = DEVICES[config.id];
+        const [isOpen, setIsOpen] = useState(false);
+        const [searchQuery, setSearchQuery] = useState('');
+        const [activeCategory, setActiveCategory] = useState('All');
+        const dropdownRef = useRef(null);
+        const searchInputRef = useRef(null);
+
+        useEffect(() => {
+          const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+              setIsOpen(false);
+            }
+          };
+          document.addEventListener('mousedown', handleClickOutside);
+          return () => document.removeEventListener('mousedown', handleClickOutside);
+        }, []);
+
+        useEffect(() => {
+          if (isOpen && searchInputRef.current) {
+            searchInputRef.current.focus();
+          }
+        }, [isOpen]);
+
+        const filteredDevices = Object.entries(DEVICES).filter(([id, dev]) => {
+          const matchesCategory = activeCategory === 'All' || dev.category === activeCategory;
+          const q = searchQuery.toLowerCase().trim();
+          const matchesSearch = !q || dev.name.toLowerCase().includes(q) || dev.brand.toLowerCase().includes(q) || dev.category.toLowerCase().includes(q);
+          return matchesCategory && matchesSearch;
+        });
+
+        const foldLabels = device.foldLabels || ['Folded', 'Unfolded'];
+
         return (
           <section className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className={`w-3 h-3 rounded-full ${slotNum === 1 ? 'bg-blue-500' : 'bg-orange-500'}`}></div>
-              <h2 className="text-sm font-bold text-gray-700">Device Slot {slotNum}</h2>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${slotNum === 1 ? 'bg-blue-500' : 'bg-orange-500'}`}></div>
+                <h2 className="text-sm font-bold text-gray-700">Device Slot {slotNum}</h2>
+              </div>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{device.brand}</span>
             </div>
-            <div className="space-y-1.5 relative">
-              <select value={config.id} onChange={(e) => handleDeviceChange(slotNum, e.target.value)} className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 font-medium cursor-pointer pr-10">
-                <optgroup label="Apple">
-                  <option value="iphone_duo">iPhone Duo (Foldable)</option>
-                  <option value="iphone_18_pro_max">iPhone 18 Pro Max</option>
-                  <option value="iphone_18_pro">iPhone 18 Pro</option>
-                  <option value="iphone_15_pro">iPhone 15 Pro</option>
-                  <option value="iphone_13_mini">iPhone 13 mini</option>
-                  <option value="iphone_original">Original iPhone (2007)</option>
-                  <option value="ipad_air_11">iPad Air 11"</option>
-                  <option value="ipad_mini_a17">iPad mini (A17 Pro)</option>
-                </optgroup>
-                <optgroup label="Samsung">
-                  <option value="s26_ultra">Galaxy S26 Ultra</option>
-                  <option value="z_fold_8_ultra">Galaxy Z Fold 8 Ultra</option>
-                  <option value="z_fold_8">Galaxy Z Fold 8 (Standard)</option>
-                  <option value="z_fold_original">Original Galaxy Fold (2019)</option>
-                </optgroup>
-                <optgroup label="Google">
-                  <option value="pixel_fold">Pixel Fold (Original)</option>
-                </optgroup>
-                <optgroup label="Xiaomi">
-                  <option value="xiaomi_18_fold">Xiaomi 18 Fold</option>
-                </optgroup>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between bg-gray-50 hover:bg-gray-100/80 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 p-2.5 font-semibold transition-all text-left"
+              >
+                <div className="truncate pr-2">
+                  <div className="text-gray-900 font-bold truncate">{device.name}</div>
+                  <div className="text-[11px] text-gray-500 font-medium">{device.category}</div>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-gray-500 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isOpen && (
+                <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-96">
+                  <div className="p-2.5 border-b border-gray-100 bg-gray-50/50 space-y-2">
+                    <div className="relative flex items-center">
+                      <Search className="w-4 h-4 text-gray-400 absolute left-3 pointer-events-none" />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search device or brand..."
+                        className="w-full pl-9 pr-8 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      />
+                      {searchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setSearchQuery('')}
+                          className="absolute right-2.5 text-gray-400 hover:text-gray-600"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex gap-1 overflow-x-auto pb-1">
+                      {CATEGORIES.map(cat => (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => setActiveCategory(cat)}
+                          className={`px-2 py-1 text-[11px] font-semibold rounded-md whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="overflow-y-auto divide-y divide-gray-50 max-h-60">
+                    {filteredDevices.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-gray-400">No matching devices found</div>
+                    ) : (
+                      filteredDevices.map(([id, dev]) => {
+                        const isSelected = id === config.id;
+                        return (
+                          <button
+                            key={id}
+                            type="button"
+                            onClick={() => {
+                              handleDeviceChange(slotNum, id);
+                              setIsOpen(false);
+                              setSearchQuery('');
+                            }}
+                            className={`w-full px-3.5 py-2.5 text-left flex items-center justify-between hover:bg-indigo-50/60 transition-colors ${isSelected ? 'bg-indigo-50/90 font-bold text-indigo-900' : 'text-gray-700'}`}
+                          >
+                            <div className="truncate pr-2">
+                              <div className="text-sm truncate">{dev.name}</div>
+                              <div className="text-[11px] text-gray-400 font-medium">
+                                {dev.brand} • {dev.category} • {dev.hasFold ? `${formatThick(dev.variants.folded.thickness)} / ${formatThick(dev.variants.unfolded.thickness)} mm` : `${formatThick(dev.variants.normal.thickness)} mm`}
+                              </div>
+                            </div>
+                            {dev.hasFold && (
+                              <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 shrink-0">
+                                {dev.foldLabels ? 'Rollable' : 'Foldable'}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
+
             {device.hasFold && (
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Form Factor</label>
                 <div className="grid grid-cols-2 gap-1.5 bg-gray-100/80 p-1 rounded-lg">
-                  <button onClick={() => updateSlot(slotNum, { formFactor: 'folded', portrait: device.variants['folded'].defaultPortrait })} className={`py-1.5 px-3 text-sm rounded-md font-semibold transition-all ${config.formFactor === 'folded' ? 'bg-white shadow-sm text-gray-900 ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'}`}>Folded</button>
-                  <button onClick={() => updateSlot(slotNum, { formFactor: 'unfolded', portrait: device.variants['unfolded'].defaultPortrait })} className={`py-1.5 px-3 text-sm rounded-md font-semibold transition-all ${config.formFactor === 'unfolded' ? 'bg-white shadow-sm text-gray-900 ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'}`}>Unfolded</button>
+                  <button onClick={() => updateSlot(slotNum, { formFactor: 'folded', portrait: device.variants['folded'].defaultPortrait })} className={`py-1.5 px-3 text-sm rounded-md font-semibold transition-all ${config.formFactor === 'folded' ? 'bg-white shadow-sm text-gray-900 ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'}`}>{foldLabels[0]}</button>
+                  <button onClick={() => updateSlot(slotNum, { formFactor: 'unfolded', portrait: device.variants['unfolded'].defaultPortrait })} className={`py-1.5 px-3 text-sm rounded-md font-semibold transition-all ${config.formFactor === 'unfolded' ? 'bg-white shadow-sm text-gray-900 ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'}`}>{foldLabels[1]}</button>
                 </div>
               </div>
             )}
@@ -318,6 +652,8 @@
                 <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Comparison Stats</h2>
                 <div className="bg-indigo-50/50 px-4 py-3 rounded-xl border border-indigo-100/80 flex flex-col gap-3">
                   {getComparisonText(dims1.screenArea, dims2.screenArea, dims1.name, dims2.name, 'Total Screen Area')}
+                  <div className="h-px bg-indigo-100/80 w-full"></div>
+                  {getThicknessComparisonText(dims1, dims2)}
                   {RATIOS[mediaRatio].value && (
                     <>
                       <div className="h-px bg-indigo-100/80 w-full"></div>
@@ -331,6 +667,24 @@
 
               <section className="space-y-4">
                 <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Global Settings</h2>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Thickness & Perspective</label>
+                  <div className="grid grid-cols-3 gap-1 bg-gray-100/80 p-1 rounded-lg">
+                    {[
+                      { id: 'front-and-side', label: 'Front + Edge' },
+                      { id: 'front', label: 'Front Only' },
+                      { id: 'side-only', label: 'Table Edge' }
+                    ].map(opt => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setPerspective(opt.id)}
+                        className={`py-1.5 px-2 text-xs rounded-md font-semibold transition-all ${perspective === opt.id ? 'bg-white shadow-sm text-indigo-700 ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="space-y-1.5 relative">
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5"><Film className="w-3.5 h-3.5" /> Media Aspect Ratio</label>
                   <select value={mediaRatio} onChange={(e) => setMediaRatio(e.target.value)} className="w-full appearance-none bg-indigo-50 border border-indigo-100 text-indigo-900 text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 font-bold cursor-pointer pr-10">
@@ -369,24 +723,34 @@
                   </div>
                 </div>
                 <div className="space-y-2 pt-2">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex justify-between"><span>Zoom Scale</span><span className="font-mono text-gray-400">{scale.toFixed(1)}x</span></label>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex justify-between"><span>Zoom Scale</span><span className="font-mono text-gray-400">{scale.toFixed(2)}x</span></label>
                   <div className="flex items-center gap-3">
-                    <button onClick={() => setScale(s => Math.max(0.5, s - 0.2))} className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-600 transition-colors"><Minus className="w-4 h-4" /></button>
-                    <input type="range" min="0.5" max="4" step="0.1" value={scale} onChange={(e) => setScale(parseFloat(e.target.value))} className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
-                    <button onClick={() => setScale(s => Math.min(4, s + 0.2))} className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-600 transition-colors"><Plus className="w-4 h-4" /></button>
+                    <button onClick={() => setScale(s => Math.max(0.5, +(s - 0.05).toFixed(2)))} className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-600 transition-colors"><Minus className="w-4 h-4" /></button>
+                    <input type="range" min="0.5" max="12" step="0.01" value={scale} onChange={(e) => setScale(parseFloat(e.target.value))} className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                    <button onClick={() => setScale(s => Math.min(12, +(s + 0.05).toFixed(2)))} className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-600 transition-colors"><Plus className="w-4 h-4" /></button>
                   </div>
                 </div>
               </section>
             </div>
             <div className="flex-1 relative bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] bg-gray-50 overflow-auto min-h-[70vh] lg:min-h-0 pb-16">
-              {viewMode === 'overlay' && (
+              {viewMode === 'overlay' && perspective !== 'side-only' && (
                 <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-md px-5 py-4 rounded-2xl shadow-xl border border-gray-100 z-40 text-sm space-y-3 pointer-events-none">
-                  <div className="flex items-center gap-3"><div className={`w-4 h-4 rounded-md ${SLOT_THEMES[1].legendColor}`}></div><span className="font-bold text-gray-800">{dims1.name}</span></div>
-                  <div className="flex items-center gap-3"><div className={`w-4 h-4 rounded-md ${SLOT_THEMES[2].legendColor}`}></div><span className="font-bold text-gray-800">{dims2.name}</span></div>
+                  <div className="flex items-center gap-3"><div className={`w-4 h-4 rounded-md ${SLOT_THEMES[1].legendColor}`}></div><span className="font-bold text-gray-800">{dims1.name} ({formatThick(dims1.thickness)} mm)</span></div>
+                  <div className="flex items-center gap-3"><div className={`w-4 h-4 rounded-md ${SLOT_THEMES[2].legendColor}`}></div><span className="font-bold text-gray-800">{dims2.name} ({formatThick(dims2.thickness)} mm)</span></div>
                 </div>
               )}
               <div className="min-h-full min-w-full p-8 md:p-16 flex items-center justify-center">
-                {viewMode === 'side-by-side' ? (
+                {perspective === 'side-only' ? (
+                  <div className="flex flex-col items-center justify-center gap-14">
+                    <div className="text-xs font-bold uppercase tracking-widest text-gray-400 bg-white/80 px-3 py-1 rounded-full border border-gray-200 shadow-sm">
+                      Tabletop Edge Profile Comparison (Scaled for Clarity)
+                    </div>
+                    <div className="flex flex-col xl:flex-row items-center xl:items-end justify-center gap-12 xl:gap-20">
+                      <SideProfileBar dims={dims1} isOverlay={false} slotNum={1} vertical={false} />
+                      <SideProfileBar dims={dims2} isOverlay={false} slotNum={2} vertical={false} />
+                    </div>
+                  </div>
+                ) : viewMode === 'side-by-side' ? (
                   <div className={`flex flex-col md:flex-row justify-center gap-16 lg:gap-32 ${{
                     'center': 'items-center md:items-center',
                     'bottom-left': 'items-start md:items-end',
@@ -397,14 +761,26 @@
                     <DevicePreview dims={dims2} isOverlay={false} slotNum={2} />
                   </div>
                 ) : (
-                  <div className={`grid relative ${{
-                    'center': 'items-center justify-items-center',
-                    'bottom-left': 'items-end justify-items-start',
-                    'bottom': 'items-end justify-items-center',
-                    'left': 'items-center justify-items-start'
-                  }[alignment]}`}>
-                    <div className="col-start-1 row-start-1"><DevicePreview dims={dims2} isOverlay={true} slotNum={2} /></div>
-                    <div className="col-start-1 row-start-1"><DevicePreview dims={dims1} isOverlay={true} slotNum={1} /></div>
+                  <div className="flex flex-col md:flex-row items-center md:items-end gap-12 lg:gap-16">
+                    <div className={`grid relative ${{
+                      'center': 'items-center justify-items-center',
+                      'bottom-left': 'items-end justify-items-start',
+                      'bottom': 'items-end justify-items-center',
+                      'left': 'items-center justify-items-start'
+                    }[alignment]}`}>
+                      <div className="col-start-1 row-start-1"><DevicePreview dims={dims2} isOverlay={true} slotNum={2} /></div>
+                      <div className="col-start-1 row-start-1"><DevicePreview dims={dims1} isOverlay={true} slotNum={1} /></div>
+                    </div>
+
+                    {perspective === 'front-and-side' && (
+                      <div className="flex flex-col items-center bg-white/75 backdrop-blur-md p-4 rounded-2xl border border-gray-200/80 shadow-lg">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Edge Thickness</span>
+                        <div className="flex items-end gap-4">
+                          <SideProfileBar dims={dims1} isOverlay={false} slotNum={1} vertical={true} />
+                          <SideProfileBar dims={dims2} isOverlay={false} slotNum={2} vertical={true} />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
